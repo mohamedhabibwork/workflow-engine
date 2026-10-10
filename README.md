@@ -228,6 +228,110 @@ Every unit accepts `metadata: Record<string, unknown>`. It is delivered to:
 
 Register your own (see `defineAction` above), or `engine.register(type, handler)`.
 
+## Portable definitions (JSON / YAML / YML)
+
+Workflows serialize to and parse from plain files — the declarative style open-source
+workflow engines use. The core stays zero-dependency: JSON is built in, YAML uses an
+injected parser or auto-imports the [`yaml`](https://www.npmjs.com/package/yaml) package
+(optional peer dependency).
+
+```ts
+import {
+  workflowToJSON,
+  workflowFromJSON,
+  workflowToYAML,
+  workflowFromYAML,
+  loadWorkflow,
+  dumpWorkflow, // facade: format inferred from filename (.json/.yaml/.yml)
+} from '@mohamedhabibwork/workflow-engine';
+
+const json = workflowToJSON(definition); // JSON string
+const same = workflowFromJSON(json); // runnable again
+
+const yaml = await workflowToYAML(definition); // YAML string (auto-imports `yaml`)
+const again = await workflowFromYAML(yaml);
+
+const fromFile = await loadWorkflow(text, { filename: 'flow.yml' });
+const asYaml = await dumpWorkflow(definition, { format: 'yaml' });
+```
+
+A serialized workflow looks like this (`order-flow.yaml`):
+
+```yaml
+$format: workflow-engine/v1
+name: order-flow
+version: 1.0.0
+metadata:
+  domain: orders
+initialContext:
+  userId: ''
+  licensed: true
+preCondition:
+  var: licensed
+  equals: true
+policies:
+  - licensed
+stages:
+  - name: payment
+    metadata:
+      sla: 1h
+    policies:
+      - name: budget
+        config:
+          maxCents: 5000
+    steps:
+      - name: charge
+        retries: 2
+        retryDelayMs: 500
+        onFailure: skip
+        preCondition:
+          var: licensed
+        actions:
+          - type: http
+            config:
+              method: POST
+              url: /charge
+              saveAs: chargeRes
+          - name: log-charge
+            type: log
+            config:
+              message: 'charged {chargeRes}'
+            preCondition:
+              var: chargeRes
+              exists: true
+```
+
+**Conditions in files are data.** A field condition picks a source (`var` from context
+vars, `meta` from the guarded unit's metadata) and applies optional checks — `equals`,
+`notEquals`, `gt`, `gte`, `lt`, `lte`, `in`, `notIn`, `contains`, `exists` — and a bare
+source (`{ var: enabled }`) is a truthiness check. Combinators nest: `{ all: [...] }`,
+`{ any: [...] }`, `{ not: {...} }`.
+
+To author conditions in code _and_ keep them serializable, use `spec()`:
+
+```ts
+import { spec } from '@mohamedhabibwork/workflow-engine';
+
+workflowBuilder('flow')
+  .preCondition(spec({ var: 'licensed', equals: true })) // portable: carries its spec
+  .stage(
+    's',
+    (stage) => stage.preCondition((ctx) => ctx.get('userId') !== ''), // inline function: NOT serializable
+  );
+```
+
+Round-trip rules:
+
+- Conditions built with `spec()` (or parsed from files) serialize losslessly and compile
+  back to real condition functions on load; parsed definitions re-serialize unchanged.
+- A plain function condition cannot be serialized: `workflowToJSON`/`workflowToYAML`
+  throw a `SerializationError` naming the exact path (e.g. `stages[0].steps[1].preCondition`),
+  or drop it with `onNonSerializableCondition: 'omit'`.
+- Functions inside `config`/`metadata` (like `inline`'s `run`) always throw — move that
+  logic into a registered custom action type instead.
+- On load, structure is validated (`DefinitionError` on bad shapes) and an unexpected
+  `$format` marker is rejected.
+
 ## Typed variables
 
 ```ts

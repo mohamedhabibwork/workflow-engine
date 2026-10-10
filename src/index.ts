@@ -40,12 +40,35 @@ export {
   UnknownPolicyError,
   ActionError,
   PreconditionError,
+  SerializationError,
   serializeError,
 } from './errors.js';
 export type { ErrorLocation } from './errors.js';
 export { randomId } from './ids.js';
 export { sleep } from './time.js';
 export { validateWorkflowDefinition } from './validate.js';
+export { workflowToJSON, workflowFromJSON } from './serialization/json.js';
+export { workflowToYAML, workflowFromYAML } from './serialization/yaml.js';
+export { loadWorkflow, dumpWorkflow, detectFormat } from './serialization/index.js';
+export type { WorkflowFileFormat } from './serialization/index.js';
+export { spec, compileConditionSpec } from './serialization/conditions.js';
+export type { DeclarativeCondition } from './serialization/conditions.js';
+export { serializeWorkflow } from './serialization/serialize.js';
+export { deserializeWorkflow } from './serialization/deserialize.js';
+export type {
+  ConditionSpec,
+  FieldConditionSpec,
+  SerializedWorkflow,
+  SerializedStage,
+  SerializedStep,
+  SerializedAction,
+  SerializedCondition,
+  YamlParserLike,
+  SerializeOptions,
+  YamlSerializeOptions,
+  LoadOptions,
+} from './serialization/types.js';
+export { WORKFLOW_FORMAT } from './serialization/types.js';
 export type {
   ActionConfig,
   ActionDefinition,

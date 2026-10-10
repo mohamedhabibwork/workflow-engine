@@ -59,6 +59,14 @@ export class PreconditionError extends WorkflowError {
   }
 }
 
+/** A workflow definition could not be serialized (e.g. a function condition). */
+export class SerializationError extends WorkflowError {
+  constructor(message: string) {
+    super(message);
+    this.name = 'SerializationError';
+  }
+}
+
 /** Extracts a human-readable message from an unknown thrown value. */
 export function errorMessage(error: unknown): string {
   if (error instanceof Error) return error.message;
