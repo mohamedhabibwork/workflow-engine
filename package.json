@@ -1,0 +1,59 @@
+{
+  "name": "@mohamedhabibwork/workflow-engine",
+  "version": "0.2.0",
+  "description": "Cross-runtime TypeScript workflow engine: workflows, stages, steps and actions with pre-conditions, metadata, typed vars, a fluent builder, pluggable resolvers and resumable persistence.",
+  "type": "module",
+  "license": "MIT",
+  "engines": {
+    "node": ">=18"
+  },
+  "files": [
+    "dist"
+  ],
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "deno": "./dist/index.js",
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs",
+      "default": "./dist/index.js"
+    }
+  },
+  "scripts": {
+    "build": "tsup",
+    "typecheck": "tsc --noEmit",
+    "lint": "oxlint",
+    "lint:fix": "oxlint --fix",
+    "format": "oxfmt",
+    "format:check": "oxfmt --check",
+    "test": "npm run test:node",
+    "test:node": "vitest run",
+    "test:bun": "bunx vitest run",
+    "test:deno": "deno test -A smoke/deno-smoke.test.ts",
+    "smoke": "node smoke/runtime-smoke.mjs"
+  },
+  "keywords": [
+    "workflow",
+    "workflow-engine",
+    "orchestration",
+    "stages",
+    "steps",
+    "actions",
+    "typescript",
+    "cross-runtime",
+    "node",
+    "bun",
+    "deno"
+  ],
+  "devDependencies": {
+    "@types/node": "^22.9.0",
+    "oxfmt": "^0.72.0",
+    "oxlint": "1.86.0",
+    "tsup": "^8.3.5",
+    "typescript": "^5.6.3",
+    "vitest": "^2.1.4"
+  }
+}

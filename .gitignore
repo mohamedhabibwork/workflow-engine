@@ -1,0 +1,8 @@
+node_modules/
+dist/
+coverage/
+.workflow-runs/
+.workflow-runs-smoke/
+*.log
+.DS_Store
+.zcode/

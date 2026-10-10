@@ -1,0 +1,40 @@
+{
+  "$schema": "./node_modules/oxlint/configuration_schema.json",
+  "plugins": ["typescript", "unicorn", "oxc"],
+  "env": {
+    "builtin": true
+  },
+  "categories": {
+    "correctness": "error",
+    "suspicious": "warn"
+  },
+  "rules": {
+    "max-lines-per-function": [
+      "error",
+      { "max": 60, "skipBlankLines": true, "skipComments": true }
+    ],
+    "max-params": ["error", 3],
+    "max-depth": ["error", 4],
+    "complexity": ["error", 10],
+    "no-console": "error",
+    "unicorn/no-array-sort": "off"
+  },
+  "ignorePatterns": ["dist/**", "coverage/**", ".workflow-runs*/**"],
+  "overrides": [
+    {
+      "files": ["src/logger.ts"],
+      "rules": {
+        "no-console": "off"
+      }
+    },
+    {
+      "files": ["tests/**", "smoke/**", "*.config.ts"],
+      "rules": {
+        "no-console": "off",
+        "max-lines-per-function": "off",
+        "max-depth": "off",
+        "unicorn/consistent-function-scoping": "off"
+      }
+    }
+  ]
+}

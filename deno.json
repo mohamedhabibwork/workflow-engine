@@ -1,0 +1,6 @@
+{
+  "tasks": {
+    "build": "deno run -A npm:tsup",
+    "test": "deno test -A smoke/deno-smoke.test.ts"
+  }
+}
